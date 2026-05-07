@@ -34,17 +34,43 @@ async function run() {
             const query = {
                 _id: new ObjectId(id)
             }
-            const users=await userCollection.findOne(query)
+            const users = await userCollection.findOne(query)
             console.log('userid', id)
             res.send(users)
         })
-        
-        app.delete('/users/:id',async(req,res)=>{
+
+        app.post('/users', async (req, res) => {
+            const newUser = req.body;
+            console.log("Data inserted", newUser)
+            const result = await userCollection.insertOne(newUser)
+            res.send(result)
+        })
+
+        app.patch('/users/:id',async(req,res)=>{
             const id=req.params.id;
-            const query={
+            const filter={
+                _id:new ObjectId(id)
+            }
+            const modifiedUser=req.body;
+
+            const UpdateDocument={
+                $set:{
+                    name:modifiedUser.name,
+                    email:modifiedUser.email,
+                    role:modifiedUser.role
+                }
+            }
+            const result=await userCollection.updateOne(filter,UpdateDocument);
+            res.send(result)
+        })
+
+
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {
                 _id: new ObjectId(id)
             }
-            const result=await userCollection.deleteOne(query)
+            const result = await userCollection.deleteOne(query)
             res.send(result)
         })
 
